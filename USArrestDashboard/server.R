@@ -8,12 +8,12 @@ function(input, output, session){
   
   # Rendering the box header  
   output$head1 <- renderText(
-    paste("5 states with high", input$var2, "Arrests")
+    paste("5 states with high rate of", input$var2, "Arrests")
   )
   
   # Rendering the box header 
   output$head2 <- renderText(
-    paste("5 states with low", input$var2, "Arrests")
+    paste("5 states with low rate of", input$var2, "Arrests")
   )
   
   
@@ -21,11 +21,8 @@ function(input, output, session){
   output$top5 <- renderTable({
     
     my_data %>% 
-      gather(Crime, Value, -state, -UrbanPop) %>% 
-      filter(Crime==input$var2) %>% 
-      group_by(state) %>% 
-      summarise(Count=sum(Value)) %>% 
-      arrange(desc(Count)) %>% 
+      select(State, input$var2) %>% 
+      arrange(desc(get(input$var2))) %>% 
       head(5)
     
   })
@@ -34,12 +31,10 @@ function(input, output, session){
   output$low5 <- renderTable({
     
     my_data %>% 
-      gather(Crime, Value, -state, -UrbanPop) %>% 
-      filter(Crime==input$var2) %>% 
-      group_by(state) %>% 
-      summarise(Count=sum(Value)) %>% 
-      arrange(Count) %>% 
+      select(State, input$var2) %>% 
+      arrange(get(input$var2)) %>% 
       head(5)
+    
     
   })
   
@@ -82,22 +77,22 @@ function(input, output, session){
   output$bar <- renderPlotly({
     my_data %>% 
       plot_ly() %>% 
-      add_bars(x=~state, y=~get(input$var2)) %>% 
+      add_bars(x=~State, y=~get(input$var2)) %>% 
       layout(title = paste("Statewise Arrests for", input$var2),
              xaxis = list(title = "State"),
-             yaxis = list(title = paste("No. of Arrests per 100,000 residents for", input$var2) ))
+             yaxis = list(title = paste(input$var2, "Arrests per 100,000 residents") ))
   })
   
   
   ### Scatter Charts 
   output$scatter <- renderPlotly({
     p = my_data %>% 
-      ggplot(aes(x=UrbanPop, y=get(input$var3))) +
+      ggplot(aes(x=get(input$var3), y=get(input$var4))) +
       geom_point() +
-      geom_smooth(method=lm) +
-      labs(title = paste("Relation b/w", input$var3 , "Arrests and Urban Population"),
-           x = "Urban Population",
-           y = input$var3) +
+      geom_smooth(method=get(input$fit)) +
+      labs(title = paste("Relation b/w", input$var3 , "and" , input$var4),
+           x = input$var3,
+           y = input$var4) +
       theme(  plot.title = element_textbox_simple(size=10,
                                                   halign=0.5))
       
@@ -111,7 +106,8 @@ function(input, output, session){
   ## Correlation plot
   output$cor <- renderPlotly({
     my_df <- my_data %>% 
-      select(-state)
+      select(-State)
+    
     # Compute a correlation matrix
     corr <- round(cor(my_df), 1)
     
@@ -119,27 +115,29 @@ function(input, output, session){
     p.mat <- cor_pmat(my_df)
     
     corr.plot <- ggcorrplot(
-      corr, hc.order = TRUE, outline.col = "white",
+      corr, 
+      hc.order = TRUE, 
+      lab= TRUE,
+      outline.col = "white",
       p.mat = p.mat
     )
     
     ggplotly(corr.plot)
+    
   })
   
   
     # Choropleth map
   output$map_plot <- renderPlot({
-    
-    
-    new_join %>% 
+      new_join %>% 
       ggplot(aes(x=long, y=lat,fill=get(input$crimetype) , group = group)) +
       geom_polygon(color="black", size=0.4) +
-      scale_fill_gradient(low="#73A5C6", high="#001B3A", name = paste(input$crimetype, "Arrests")) +
+      scale_fill_gradient(low="#73A5C6", high="#001B3A", name = paste(input$crimetype, "Arrest rate")) +
       theme_void() +
-      labs(title = paste("Choropleth map of", input$crimetype , " Arrests by state in 1973")) +
+      labs(title = paste("Choropleth map of", input$crimetype , " Arrests per 100,000 residents by state in 1973")) +
       theme(
         plot.title = element_textbox_simple(face="bold", 
-                                            size=20,
+                                            size=18,
                                             halign=0.5),
         
         legend.position = c(0.2, 0.1),
