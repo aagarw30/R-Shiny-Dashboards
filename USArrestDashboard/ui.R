@@ -33,15 +33,17 @@ dashboardPage(
       tabItem(tabName = "data", 
               tabBox(id="t1", width = 12, 
                      tabPanel("About", icon=icon("address-card"),
-                              fluidRow(column(width = 8, tags$img(src="crime.jpg"),
-                                              tags$br() , 
-                                              tags$a("Photo by Campbell Jensen on Unsplash") ,
-                                              align = "center"),
-                                       column(width = 4, 
-                                              tags$p("This data set comes along with base R and contains statistics, in arrests per 100,000 residents for assault, murder, and rape in each of the 50 US states in 1973."),
-                                              tags$br(),
-                                              tags$p("Also, given is the percent of the population living in urban areas."),
-                                              align = "left"))), 
+fluidRow(
+  column(width = 8, tags$img(src="crime.jpg", width =700 , height = 300),
+         tags$br() , 
+         tags$a("Photo by Campbell Jensen on Unsplash"), align="center" ),
+  column(width = 4, tags$br() ,
+         tags$p("This data set comes along with base R and contains statistics, in arrests per 100,000 residents for assault, murder, and rape in each of the 50 US states in 1973. Also, given is the percent of the population living in urban areas.")
+  )
+)
+
+                              
+                              ), 
                      tabPanel("Data", dataTableOutput("dataT"), icon = icon("table")), 
                      tabPanel("Structure", verbatimTextOutput("structure"), icon=icon("uncharted")),
                      tabPanel("Summary Stats", verbatimTextOutput("summary"), icon=icon("chart-pie"))
