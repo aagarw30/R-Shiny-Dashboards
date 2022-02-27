@@ -34,9 +34,9 @@ dashboardPage(
               tabBox(id="t1", width = 12, 
                      tabPanel("About", icon=icon("address-card"),
 fluidRow(
-  column(width = 8, tags$img(src="crime.jpg", width =700 , height = 300),
-         tags$br() , 
-         tags$a("Photo by Campbell Jensen on Unsplash"), align="center" ),
+  column(width = 8, tags$div(tags$img(src="crime.jpg", width =700 , height = 300),
+                             tags$br() , 
+                             tags$a("Photo by Campbell Jensen on Unsplash"), align="center" )),
   column(width = 4, tags$br() ,
          tags$p("This data set comes along with base R and contains statistics, in arrests per 100,000 residents for assault, murder, and rape in each of the 50 US states in 1973. Also, given is the percent of the population living in urban areas.")
   )
